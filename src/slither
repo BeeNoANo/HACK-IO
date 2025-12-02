@@ -1,0 +1,189 @@
+// --- SLITHER.IO TACTICAL CONSOLE V2.1 ---
+
+(function() {
+    // 1. CLEANUP
+    var oldMenu = document.getElementById('hacker-console-v2');
+    if (oldMenu) oldMenu.remove();
+
+    // 2. UI CONSTRUCTION (Chuẩn Style V2.1)
+    var htmlContent = `
+    <div id="hacker-console-v2" style="
+        position: fixed; 
+        top: 100px; left: 100px; 
+        width: 320px; 
+        background: rgba(12, 12, 12, 0.95); 
+        border: 1px solid #00ff00; 
+        color: #00ff00; 
+        font-family: 'Consolas', 'Courier New', monospace; 
+        z-index: 9999999; 
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        border-radius: 4px;
+        font-size: 13px;">
+        
+        <div id="hacker-header" style="
+            padding: 8px 10px; 
+            background: linear-gradient(90deg, #003300, #001100); 
+            cursor: move; 
+            border-bottom: 1px solid #00ff00;
+            display: flex; justify-content: space-between; align-items: center;
+            user-select: none;">
+            <span style="font-weight: bold; text-shadow: 0 0 5px #00ff00;">🐍 SLITHER TACTICAL V2.1</span>
+            <span style="font-size: 10px; color: #888;">[DRAG ME]</span>
+        </div>
+
+        <div style="padding: 15px;">
+            
+            <div style="margin-bottom: 15px;">
+                <label style="font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 1px;">👁️ TACTICAL ZOOM</label>
+                
+                <div style="display: flex; gap: 8px; margin-top: 6px; height: 30px;">
+                    <input type="range" id="rng-zoom" min="0.1" max="2" step="0.05" value="0.9" style="
+                        flex: 1; accent-color: #00ff00; background: #333;">
+                    
+                    <span id="lbl-zoom-val" style="
+                        flex: 0 0 40px; color: white; font-weight: bold; 
+                        display: flex; align-items: center; justify-content: center; font-size: 11px;">
+                        0.9
+                    </span>
+                </div>
+                <div style="font-size: 10px; color: #888; margin-top: 3px;">*Scroll mouse or drag slider</div>
+            </div>
+
+            <hr style="border-color: #333; border-style: dashed; margin: 10px 0;">
+
+            <div style="margin-bottom: 15px;">
+                <label style="font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 1px;">⚡ PERFORMANCE & VISUALS</label>
+                
+                <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
+                    <label style="display: flex; align-items: center; cursor: pointer; user-select: none;">
+                        <input type="checkbox" id="chk-kill-bg" style="margin-right: 8px; accent-color: #00ff00;"> 
+                        <span>⬛ Remove Background (Black Mode)</span>
+                    </label>
+
+                    <label style="display: flex; align-items: center; cursor: pointer; user-select: none;">
+                        <input type="checkbox" id="chk-kill-glow" style="margin-right: 8px; accent-color: #00ff00;"> 
+                        <span>🔦 Remove Glow (High FPS)</span>
+                    </label>
+                </div>
+            </div>
+
+             <div style="margin-bottom: 10px;">
+                <label style="font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 1px;">🚀 UTILITIES</label>
+                <button id="btn-force-skin" style="
+                    width: 100%; margin-top: 6px; padding: 8px; 
+                    background: rgba(0, 255, 255, 0.1); color: cyan; border: 1px solid cyan; 
+                    cursor: pointer; font-weight: bold; font-family: inherit; font-size: 11px;">
+                    🔓 FORCE UNLOCK SKINS
+                </button>
+            </div>
+
+
+            <button id="btn-close-menu" style="
+                width: 100%; margin-top: 5px; background: #330000; color: #ff4444; 
+                border: 1px solid #ff4444; padding: 6px; cursor: pointer; font-family: inherit; font-size: 10px;">
+                EXIT SYSTEM
+            </button>
+        </div>
+    </div>
+    `;
+
+    // 3. INJECT UI
+    var container = document.createElement('div');
+    container.innerHTML = htmlContent;
+    document.body.appendChild(container);
+
+    // 4. REFERENCES
+    var consoleDiv = document.getElementById('hacker-console-v2');
+    var header = document.getElementById('hacker-header');
+    var rngZoom = document.getElementById('rng-zoom');
+    var lblZoomVal = document.getElementById('lbl-zoom-val');
+    var chkKillBg = document.getElementById('chk-kill-bg');
+    var chkKillGlow = document.getElementById('chk-kill-glow');
+    var btnForceSkin = document.getElementById('btn-force-skin');
+    var btnClose = document.getElementById('btn-close-menu');
+
+    // 5. DRAGGABLE LOGIC (Reuse V2.1)
+    var isDragging = false, offsetX, offsetY;
+    header.onmousedown = function(e) { isDragging = true; offsetX = e.clientX - consoleDiv.offsetLeft; offsetY = e.clientY - consoleDiv.offsetTop; header.style.cursor = 'grabbing'; };
+    document.onmousemove = function(e) { if (isDragging) { consoleDiv.style.left = (e.clientX - offsetX) + 'px'; consoleDiv.style.top = (e.clientY - offsetY) + 'px'; } };
+    document.onmouseup = function() { isDragging = false; header.style.cursor = 'move'; };
+
+    // 6. HACKING LOGIC (SLITHER SPECIFIC)
+
+    // A. ZOOM LOGIC
+    // Slither dùng biến 'gsc' (Global Scale) để chỉnh zoom.
+    // Hack: Chúng ta ghi đè giá trị này liên tục.
+    
+    // Zoom Loop: Cưỡng ép game giữ mức zoom ta muốn
+    var targetZoom = 0.9;
+    var zoomInterval = setInterval(function() {
+        if (window.gsc) { // Kiểm tra biến gsc có tồn tại không
+            window.gsc = targetZoom; 
+        }
+    }, 100);
+
+    // Xử lý thanh trượt
+    rngZoom.oninput = function() {
+        targetZoom = parseFloat(this.value);
+        lblZoomVal.innerText = targetZoom;
+    };
+
+    // Xử lý lăn chuột (Mouse Wheel) để zoom như game bắn súng
+    document.body.onwheel = function(e) {
+        if (e.deltaY < 0) { // Lăn lên -> Zoom vào
+            targetZoom = Math.min(targetZoom + 0.05, 2);
+        } else { // Lăn xuống -> Zoom ra
+            targetZoom = Math.max(targetZoom - 0.05, 0.1);
+        }
+        rngZoom.value = targetZoom;
+        lblZoomVal.innerText = targetZoom.toFixed(2);
+    };
+
+    // B. REMOVE BACKGROUND
+    chkKillBg.onchange = function() {
+        if (this.checked) {
+            // Thay đổi ảnh nền thành màu đen
+            if(window.ii) window.ii.src = ""; // Xóa source ảnh nền
+            document.body.style.background = "#000000";
+            console.log(">> Background removed.");
+        }
+    };
+
+    // C. REMOVE GLOW (Tăng FPS kinh hoàng)
+    chkKillGlow.onchange = function() {
+        // Slither vẽ glow bằng các layer canvas, ta cần chặn nó
+        // Đây là kỹ thuật Hook vào Setting của game (thường là 'm_q' = quality)
+        if (this.checked) {
+             // High FPS mode
+             if(window.high_quality) window.high_quality = false;
+             if(window.want_quality) window.want_quality = 0;
+             console.log(">> Glow removed. FPS Boosted.");
+        }
+    };
+
+    // D. UNLOCK SKINS
+    btnForceSkin.onclick = function() {
+        // Biến localStorage lưu trạng thái share social
+        // Game check: Nếu đã share -> Mở skin
+        localStorage.setItem('social-sharing', 1);
+        localStorage.setItem('slither-skin', 1);
+        
+        // Reload nhẹ UI game (nếu cần)
+        Game.Notify("SKINS UNLOCKED", "Refresh page to choose new skins!", [21,1]);
+        // Lưu ý: Slither có thể cần F5 để load lại list skin
+    };
+
+    // E. CLOSE
+    btnClose.onclick = function() {
+        clearInterval(zoomInterval); // Dừng ép zoom
+        document.body.onwheel = null; // Trả lại chuột
+        consoleDiv.remove();
+    };
+
+    // HÀM GIẢ LẬP NOTIFY (Nếu game ko có hàm này thì dùng alert)
+    if (!window.Game) window.Game = {};
+    if (!window.Game.Notify) window.Game.Notify = function(title, msg) { console.log(`[${title}] ${msg}`); };
+
+    console.log("%c [SLITHER] Tactical Console V2.1 Injected.", "color: lime; font-weight: bold;");
+
+})();
